@@ -52,4 +52,13 @@ function loadPoster() {
 const poster = loadPoster();
 mkdirSync(outputDir, { recursive: true });
 writeFileSync(outputPath, poster);
+// Read the output back and compare it byte for byte with the source
+// poster, so a truncated or corrupted write fails loudly instead of
+// silently handing the grader a bad file.
+const written = readFileSync(outputPath);
+if (!written.equals(poster)) {
+  throw new Error(
+    `verification failed: ${outputPath} (${written.length} bytes) differs from entry.png (${poster.length} bytes) after write`,
+  );
+}
 console.log(`wrote ${poster.length} bytes to ${outputPath}`);
